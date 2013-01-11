@@ -1,0 +1,105 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: security.yml }
+
+framework:
+    #esi:             ~
+    translator:      { fallback: %locale% }
+    secret:          %secret%
+    router:          { resource: "%kernel.root_dir%/config/routing.yml" }
+    form:            true
+    csrf_protection: true
+    validation:      { enable_annotations: true }
+    templating:      { engines: ['twig'] } #assets_version: SomeVersionScheme
+    default_locale:  %locale%
+    session:         ~
+
+# Twig Configuration
+twig:
+    debug:            %kernel.debug%
+    strict_variables: %kernel.debug%
+
+# Assetic Configuration
+assetic:
+    debug:          %kernel.debug%
+    use_controller: false
+    bundles:        [ 'DiscutereAppBundle' ]
+    filters:
+        cssrewrite: ~
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   %database_driver%
+        host:     %database_host%
+        port:     %database_port%
+        dbname:   %database_name%
+        user:     %database_user%
+        password: %database_password%
+        charset:  UTF8
+
+    orm:
+        auto_generate_proxy_classes: %kernel.debug%
+        auto_mapping: true
+
+# Swiftmailer Configuration
+swiftmailer:
+    transport: %mailer_transport%
+    host:      %mailer_host%
+    username:  %mailer_user%
+    password:  %mailer_password%
+    spool:     { type: memory }
+
+fos_user:
+    db_driver: orm
+    firewall_name: main
+    user_class: Discutere\AppBundle\Entity\User
+
+fos_comment:
+    acl: ~
+    acl_roles:
+        comment:
+            create: ROLE_USER
+            view:   IS_AUTHENTICATED_ANONYMOUSLY
+            edit:   ROLE_ADMIN
+            delete: ROLE_ADMIN
+        thread:
+            create: IS_AUTHENTICATED_ANONYMOUSLY
+            view:   IS_AUTHENTICATED_ANONYMOUSLY
+            edit:   ROLE_ADMIN
+            delete: ROLE_ADMIN
+        vote:
+            create: ROLE_ADMIN
+            view:   ROLE_ADMIN
+            edit:   ROLE_ADMIN
+            delete: ROLE_ADMIN
+    db_driver: orm
+    class:
+        model:
+            comment: Discutere\AppBundle\Entity\Comment
+            thread:  Discutere\AppBundle\Entity\Thread
+    service:
+        acl:
+            comment: fos_comment.acl.comment.roles
+            thread:  fos_comment.acl.thread.roles
+        manager:
+            comment: fos_comment.manager.comment.acl
+            thread:  fos_comment.manager.thread.acl
+
+hwi_oauth:
+    connect: ~
+    firewall_name: main
+    fosub:
+        username_iterations: 30
+        properties:
+            github: github
+            google: google
+    resource_owners:
+        google:
+            type:                google
+            client_id:           %google_client_id%
+            client_secret:       %google_client_secret%
+        github:
+            type:                github
+            client_id:           %github_client_id%
+            client_secret:       %github_client_secret%
